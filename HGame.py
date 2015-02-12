@@ -5,6 +5,19 @@ from panda3d.core import WindowProperties, Filename
 class HGame(ShowBase):
     def __init__(self, sizeX=640, sizeY=480, title="Title", particles=True, fixedSize=True, cursorHide=False,
                  icon="None", cursorFile="None",posX=150,posY=50):
+        """
+
+        :param sizeX: Window horizontal size in pixels
+        :param sizeY: Window vertical size i pixels
+        :param title: Window's title bar text
+        :param particles: Enable particles
+        :param fixedSize: Window can be resized
+        :param cursorHide: Hide cursor
+        :param icon: filepath to window icon
+        :param cursorFile: filepath to window cursor icon
+        :param posX: window initial X position
+        :param posY: window initial Y position
+        """
         ShowBase.__init__(self)
         if particles:
             base.enableParticles()
