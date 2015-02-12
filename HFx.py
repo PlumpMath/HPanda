@@ -12,8 +12,8 @@ class HExtendedParticles(ParticleEffect):
         HExtendedParticles.count += 1
 
     def startInPos(self, pos, level, life=0):
-        # self.reparentTo(level.Base.render)
-        #self.setPos(level.Base.render,pos)
+        # self.reparentTo(scene.Base.render)
+        #self.setPos(scene.Base.render,pos)
         ParticleEffect.start(self,parent=level.Base.render, renderParent=level.Base.render)
         self.setPos(pos)
         if life != 0:

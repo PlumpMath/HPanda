@@ -4,8 +4,8 @@ from math import sin
 from random import random
 
 class HFloatingObject(HDynamicObject):
-    def __init__(self,name,level,egg,x=0,y=0,z=0,direction=Vec3(0,0,1)):
-        HDynamicObject.__init__(self,name,level,egg,None,x,y,z)
+    def __init__(self,name,scene,egg,x=0,y=0,z=0,direction=Vec3(0,0,1)):
+        HDynamicObject.__init__(self,name,scene,egg,None,x,y,z)
         self.initPos=Point3(x,y,z)
         self.amplitud=0
         self.frecuency=0
@@ -17,7 +17,7 @@ class HFloatingObject(HDynamicObject):
             self.offset=random()
         else:
             self.offset=0
-        self.level.Base.taskMgr.add(self._floatTask,self.name+"_floatTask")
+        self.scene.Base.taskMgr.add(self._floatTask,self.name+"_floatTask")
     def _floatTask(self,t):
         p=self.initPos+(self.direction*(sin((t.time+self.offset)*self.frequency)*self.amplitud))
         self.setPos(p)
@@ -33,8 +33,8 @@ class HCilindricalBillboard(NodePath):
         self.setBillboardAxis()
 
 class HFloatingCilindricalBillBoard(HFloatingObject):
-    def __init__(self,name,egg,level,x=0,y=0,z=0,direction=Vec3(0,0,1)):
-        HFloatingObject.__init__(self,name,level,egg,x,y,z,direction)
+    def __init__(self,name,egg,scene,x=0,y=0,z=0,direction=Vec3(0,0,1)):
+        HFloatingObject.__init__(self,name,scene,egg,x,y,z,direction)
         self.setBillboardAxis()
 
 class HOrbitingObject(NodePath):
@@ -57,5 +57,5 @@ class HOrbitingObject(NodePath):
     def _orbit(self,t):
         if self.level.pause is False:
             self.setHpr(self,self.direction*self.factor*globalClock.getDt())
-            #self.level.drawLine(self.getPos(self.level.Base.render),self.orb.getPos(self.level.Base.render),autoClear=False)
+            #self.scene.drawLine(self.getPos(self.scene.Base.render),self.orb.getPos(self.scene.Base.render),autoClear=False)
         return t.cont
