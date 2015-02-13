@@ -4,7 +4,7 @@ from panda3d.core import WindowProperties, Filename
 
 class HGame(ShowBase):
     def __init__(self, sizeX=640, sizeY=480, title="Title", particles=True, fixedSize=True, cursorHide=False,
-                 icon="None", cursorFile="None",posX=150,posY=50):
+                 icon="None", cursorFile="None",posX=300,posY=50):
         """
 
         :param sizeX: Window horizontal size in pixels
