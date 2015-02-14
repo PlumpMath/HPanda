@@ -256,7 +256,7 @@ class HInteractiveObject(HGameObject):
 
 
 class HDynamicObject(NodePath):
-    def __init__(self, name, scene, visibleEgg, collisionEgg=None, x0=0, y0=0, z0=0, parent=None, margin=0.05, mass=0,
+    def __init__(self, name, scene, visibleEgg, collisionEgg=None, x0=0, y0=0, z0=0, parent=None, margin=0.02, mass=0,
                  directRender=True, convex=True):
         self.name = name
         self.scene = scene

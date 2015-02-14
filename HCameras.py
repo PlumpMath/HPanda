@@ -10,19 +10,23 @@ class BaseCamera():
         pass
 
 class ThirdPersonCamera(BaseCamera):
-    def __init__(self,scene,target,lookAtHeight,initX=0,initY=0,initZ=0,speed=1):
+    def __init__(self,scene,target,lookAtHeight,initX=0,initY=0,initZ=0,speed=1,debug=False):
         BaseCamera.__init__(self,scene)
         self.target=target
         self.lookAtTarget=self.scene.loadEgg("HPanda/axis")
-        self.lookAtTarget.setScale(0.2)
+        self.lookAtTarget.setScale(1)
         self.lookAtTarget.setZ(self.target,lookAtHeight)
         self.lookAtTarget.reparentTo(target)
+        #self.lookAtTarget.setScale(1)
         self.scene.camera.setPos(self.scene.render,initX,initY,initZ)
         self.scene.camera.lookAt(self.lookAtTarget)
-        self.positionTarget=NodePath(self.lookAtTarget)
+        self.positionTarget=self.scene.loadEgg("HPanda/axis")
         self.positionTarget.setPos(self.scene.render,initX,initY,initZ)
         self.positionTarget.reparentTo(self.target)
         self.speed=speed
+        if debug is False:
+            self.lookAtTarget.hide()
+            self.positionTarget.hide()
 
     def execute(self,t):
         v = self.positionTarget.getPos( self.scene.camera )

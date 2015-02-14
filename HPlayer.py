@@ -1,9 +1,10 @@
 from direct.actor.Actor import Actor
 from panda3d.bullet import BulletCharacterControllerNode as Character
+from panda3d.core import NodePath
 from HUtils import *
 
 
-class HPlayer(Actor):
+class HPlayer(NodePath): ###Implementarlo como Nodepath y el actor como hijo
     def __init__(self, name, scene, visualMesh, collisionMesh, animations, step=0.2, margin=0.01):
         """
         :type collisionMesh: String
@@ -20,8 +21,18 @@ class HPlayer(Actor):
         """
         self.name = name
         self.scene = scene
-        Actor.__init__(self, self.scene.loadEgg(visualMesh), animations)
-        self.setPhysics(collisionMesh, step, margin)
+        m = self.scene.Base.loader.loadModel(collisionMesh)
+        sTuple = modelToConvex(m)
+        sTuple[0].setMargin(margin)
+        self.body = Character(sTuple[0], step, self.name + "_Character")
+        #self.attachNewNode(self.body)
+        self.body.setPythonTag("name", self.name + "_Character")
+        self.scene.world.attachCharacter(self.body)
+
+        NodePath.__init__(self,self.body)
+        self.actor=Actor(self.scene.loadEgg(visualMesh), animations)
+        self.actor.reparentTo(self)
+        #self.setPhysics(collisionMesh, step, margin)
 
     def setPhysics(self, collisionMesh, step, margin):
         m = self.scene.Base.loader.loadModel(collisionMesh)
@@ -31,3 +42,4 @@ class HPlayer(Actor):
         self.attachNewNode(self.body)
         self.body.setPythonTag("name", self.name + "_Character")
         self.scene.world.attachCharacter(self.body)
+        self.actor.reparentTo(self)
