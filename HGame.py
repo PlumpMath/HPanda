@@ -1,10 +1,10 @@
 from direct.showbase.ShowBase import ShowBase
-from panda3d.core import WindowProperties, Filename
+from panda3d.core import WindowProperties, Filename, loadPrcFileData
 
 
 class HGame(ShowBase):
     def __init__(self, sizeX=640, sizeY=480, title="Title", particles=True, fixedSize=True, cursorHide=False,
-                 icon="None", cursorFile="None",posX=300,posY=50):
+                 icon="None", cursorFile="None", posX=0, posY=0):
         """
 
         :param sizeX: Window horizontal size in pixels
@@ -22,15 +22,16 @@ class HGame(ShowBase):
         if particles:
             base.enableParticles()
         self.propierties = WindowProperties()
-        self.propierties.setSize(sizeX, sizeY)
-        self.propierties.setTitle(title)
+        loadPrcFileData("", "win-size " + str(sizeX) + " " + str(sizeY))
+        loadPrcFileData("", "window-title " + title)
         self.propierties.setFixedSize(fixedSize)
         self.propierties.setCursorHidden(cursorHide)
         if icon != "None":
             self.propierties.setIconFilename(Filename(icon))
         if cursorFile != "None":
             self.propierties.setCursorFilename(Filename(cursorFile))
-        self.propierties.setOrigin(posX,posY)
+        if posX != 0 and posY != 0:
+            self.propierties.setOrigin(posX, posY)
         base.win.requestProperties(self.propierties)
         self.setup()
 
