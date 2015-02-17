@@ -1,11 +1,17 @@
 # from direct.showbase import DirectObject
-import pygame  # ********  pygame must be in the Main.py directory
-# THIS FILE MUST BE IN THE MAIN.PY DIRECTORY BECAUSE SON PATH ISSUES
+# ********  pygame must be in the Main.py directory
+# THIS FILE MUST BE IN THE MAIN.PY DIRECTORY BECAUSE SOME PATH ISSUES
+print "Importing pygame"
+import pygame
 
-
+mappingDict = {"axes": [["arrow_left", "arrow_right"], ["arrow_down", "arrow_up"]],
+               "buttons": ["z", "x"]}
+# mappingDict={"axis":[axis0List[neg,pos],axis1List[neg,pos]....],
+# "buttons":[button0,button1...]}
 class HJoystickSensor():
     def __init__(self, joystickId=0):
         # print os.getcwd()
+        print "Starting Joystick"
         pygame.init()
         pygame.joystick.init()
         c = pygame.joystick.get_count()
@@ -36,11 +42,6 @@ class HJoystickSensor():
         # #Hats y otras cosas que no uso ahorita
 
 
-mappingDict = {"axes": [["arrow_left", "arrow_right"], ["arrow_down", "arrow_up"]],
-               "buttons": ["z", "x"]}
-# mappingDict={"axis":[axis0List[neg,pos],axis1List[neg,pos]....],
-# "buttons":[button0,button1...]}
-
 class HJoyKeySensor(HJoystickSensor):
     def __init__(self, mappingDict, joystickId=0):
         HJoystickSensor.__init__(self, joystickId)
@@ -54,7 +55,7 @@ class HJoyKeySensor(HJoystickSensor):
         self.axisChangeEventName = self.axisEventName + "changed_"
         self.buttonChangeEventName = self.buttonEventName + "changed_"
 
-        #Up events
+        # Up events
         self.axisUpEventName = self.axisEventName + "-up_"
         self.buttonUpEventName = self.buttonEventName + "-up_"
 
@@ -126,23 +127,23 @@ class HJoyKeySensor(HJoystickSensor):
                     messenger.send(self.buttonChangeEventName + str(nb),
                                    sentArgs=[self.buttonsLastValue[nb], joyButtonValue])
                     if joyButtonValue is True and self.buttonsLastValue[nb] is False:
-                        messenger.send(self.buttonDownEventName+str(nb))
+                        messenger.send(self.buttonDownEventName + str(nb))
                     elif joyButtonValue is False and self.buttonsLastValue[nb] is True:
-                        messenger.send(self.buttonUpEventName+str(nb))
-                self.buttonsLastValue[nb]=joyButtonValue
+                        messenger.send(self.buttonUpEventName + str(nb))
+                self.buttonsLastValue[nb] = joyButtonValue
             except:
-                buttonValue=self.buttonKeyStates[nb]
+                buttonValue = self.buttonKeyStates[nb]
                 messenger.send(self.buttonEventName + str(nb), sentArgs=[buttonValue])
                 # print self.mapping["buttons"][nb], "- pressed"
                 if buttonValue != self.buttonsLastValue[nb]:
                     messenger.send(self.buttonChangeEventName + str(nb),
                                    sentArgs=[self.buttonsLastValue[nb], buttonValue])
                     if buttonValue is True and self.buttonsLastValue[nb] is False:
-                        messenger.send(self.buttonDownEventName+str(nb))
+                        messenger.send(self.buttonDownEventName + str(nb))
                     elif buttonValue is False and self.buttonsLastValue[nb] is True:
-                        messenger.send(self.buttonUpEventName+str(nb))
-                        #print "Button: ",nb,"-up"
-                self.buttonsLastValue[nb]=buttonValue
+                        messenger.send(self.buttonUpEventName + str(nb))
+                        # print "Button: ",nb,"-up"
+                self.buttonsLastValue[nb] = buttonValue
         for na in range(len(self.mapping["axes"])):
             try:
                 axisValue = self.joy.get_axis(na) * -1
@@ -153,7 +154,7 @@ class HJoyKeySensor(HJoystickSensor):
                     if abs(self.axesLastValue[na]) > 0 and axisValue == 0:
                         messenger.send(self.axisUpEventName + str(na))
                     elif self.axesLastValue[na] == 0 and abs(axisValue) > 0:
-                        messenger.send(self.axisDownEventName + str(na))
+                        messenger.send(self.axisDownEventName + str(na), sentArgs=[axisValue])
                 self.axesLastValue[na] = axisValue
 
             except:
@@ -172,7 +173,7 @@ class HJoyKeySensor(HJoystickSensor):
                         messenger.send(self.axisUpEventName + str(na))
                         # print "Axis:", na, " -up"
                     elif self.axesLastValue[na] == 0 and abs(value) > 0:
-                        messenger.send(self.axisDownEventName + str(na))
+                        messenger.send(self.axisDownEventName + str(na), sentArgs=[value])
                 self.axesLastValue[na] = value
         return t.cont
         ##Agregar un Enet Handler para cada evento enviado y ahi ver el UP y DOWN
