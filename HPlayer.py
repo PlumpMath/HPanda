@@ -4,7 +4,7 @@ from panda3d.core import NodePath
 from HUtils import *
 
 
-class HPlayer(NodePath): ###Implementarlo como Nodepath y el actor como hijo
+class HPlayer(NodePath):  # ##Implementarlo como Nodepath y el actor como hijo
     def __init__(self, name, scene, visualMesh, collisionMesh, animations, step=0.2, margin=0.01):
         """
         :type collisionMesh: String
@@ -29,8 +29,8 @@ class HPlayer(NodePath): ###Implementarlo como Nodepath y el actor como hijo
         self.body.setPythonTag("name", self.name + "_Character")
         self.scene.world.attachCharacter(self.body)
 
-        NodePath.__init__(self,self.body)
-        self.actor=Actor(self.scene.loadEgg(visualMesh), animations)
+        NodePath.__init__(self, self.body)
+        self.actor = Actor(self.scene.loadEgg(visualMesh), animations)
         self.actor.reparentTo(self)
         #self.setPhysics(collisionMesh, step, margin)
 
@@ -42,4 +42,34 @@ class HPlayer(NodePath): ###Implementarlo como Nodepath y el actor como hijo
         self.attachNewNode(self.body)
         self.body.setPythonTag("name", self.name + "_Character")
         self.scene.world.attachCharacter(self.body)
+        self.actor.reparentTo(self)
+
+
+class RigidPlayer(NodePath):
+    def __init__(self, name, scene, visualMesh, collisionMesh, animations, mass, step=0.2, margin=0.01):
+        """
+        :type collisionMesh: String
+        :type visualMesh: String
+        :type name: String
+        :type margin: Float
+        :param name: Name
+        :param scene: Scene
+        :param visualMesh: Egg to use as visual mesh
+        :param collisionMesh: Egg to use as convex shape for physics
+        :param animations: Animation dict
+        :param step: Character step height
+        :param margin: Physics shape margin
+        """
+        self.name = name
+        self.scene = scene
+        self.body = BulletRigidBodyNode(self.name + "_RigidPlayer")
+        self.body.setMass(mass)
+        m = self.scene.Base.loader.loadModel(collisionMesh)
+        sTuple = modelToConvex(m)
+        sTuple[0].setMargin(margin)
+        self.body.addShape(sTuple[0], sTuple[1])
+        self.body.setPythonTag("name", self.name + "_RigidPlayer")
+        self.scene.world.attachRigidBody(self.body)
+        NodePath.__init__(self, self.body)
+        self.actor = Actor(self.scene.loadEgg(visualMesh), animations)
         self.actor.reparentTo(self)

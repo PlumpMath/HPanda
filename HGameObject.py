@@ -6,7 +6,7 @@ from direct.actor.Actor import Actor
 from HUtils import *
 from panda3d.bullet import BulletCharacterControllerNode, BulletRigidBodyNode, BulletGhostNode
 from panda3d.bullet import BulletClosestHitSweepResult
-from panda3d.core import TransformState, BitMask32, VBase3, Point3, Vec3, NodePath
+from panda3d.core import TransformState, BitMask32, VBase3, Point3, Vec3, NodePath, LODNode
 
 physicsTypes = {"static": 0, "character": 1, "dynamic": 2, "None": 3, "ghost": 4}
 
@@ -54,7 +54,7 @@ class HNewGameObject(NodePath):
             self.reparentTo(parent)
 
 
-class HGameObject():
+class HGameObject(): #Deprecated
     def __init__(self, name, scene, visualMeshEgg, parent, physicsType, physicsShapeEgg=None, shapeMargin=0.04,
                  animable=False, animationsDict=None, stepHeight=0.5, x=0, y=0, z=0, mass=0, perpixelShading=False):
         """
@@ -225,7 +225,7 @@ class HGameObject():
         self.body.applyCentralForce(globalV)
 
 
-class HInteractiveObject(HGameObject):
+class HInteractiveObject(HGameObject): ##Staticobject
     def __init__(self, scene, name0, visualEgg, collisionEgg, mass, x0=0, y0=0, z0=0, margin=0.04,
                  sound=None, perpixelShading=True, CCD=False, CCDradius=0.05):
         HGameObject.__init__(self, name0, scene, visualEgg, scene.Base.render, 2, collisionEgg, margin, False, None,
@@ -255,12 +255,43 @@ class HInteractiveObject(HGameObject):
         print self.name, "_destroyed"
 
 
-class HDynamicObject(NodePath):
+class HDynamicObject(NodePath): #Only rigid body
     def __init__(self, name, scene, visibleEgg, collisionEgg=None, x0=0, y0=0, z0=0, parent=None, margin=0.02, mass=0,
                  directRender=True, convex=True):
         self.name = name
         self.scene = scene
         NodePath.__init__(self, self.scene.loadEgg(visibleEgg))
+        self.body = BulletRigidBodyNode(self.name + "_RigidBody")
+        self.attachNewNode(self.body)
+        if collisionEgg != None:
+            m = self.scene.Base.loader.loadModel(collisionEgg)
+            if convex:
+                sTuple = modelToConvex(m)
+            else:
+                sTuple = modelToShape(m)
+            sTuple[0].setMargin(margin)
+            self.body.addShape(sTuple[0], sTuple[1])
+            self.body.setMass(mass)
+            self.body.setPythonTag("name", self.name + "_RigidBody")
+            self.scene.world.attachRigidBody(self.body)
+        self.setPos(x0, y0, z0)
+        if directRender:
+            self.reparentTo(self.scene.Base.render)
+        elif parent != None:
+            self.reparentTo(parent)
+
+class HLodDynamicObject(NodePath):
+    def __init__(self, name, scene, visibleLODsDict={"eggfileName":("maxFar","minNear")}, collisionEgg=None, x0=0, y0=0, z0=0, parent=None, margin=0.02, mass=0,
+                 directRender=True, convex=True):
+        self.name = name
+        self.scene = scene
+        NodePath.__init__(self,LODNode(name+"_LODNode"))
+        ###LOD###
+        for k in visibleLODsDict.keys():
+            v=base.loader.loadModel(k)
+            v.reparentTo(self)
+            self.node().addSwitch(visibleLODsDict[k][0],visibleLODsDict[k][1])
+        #########
         self.body = BulletRigidBodyNode(self.name + "_RigidBody")
         self.attachNewNode(self.body)
         if collisionEgg != None:
